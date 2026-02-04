@@ -169,9 +169,12 @@ body::after {
 .bento-card::after {
   content: "";
   position: absolute;
-  inset: -40% -20% auto -20%;
-  height: 60%;
-  background: radial-gradient(circle, rgba(246, 211, 124, 0.18), transparent 70%);
+  inset: 0;
+  background: radial-gradient(
+    circle at var(--mx, 30%) var(--my, 10%),
+    rgba(246, 211, 124, 0.22),
+    transparent 65%
+  );
   opacity: 0;
   transition: opacity 0.4s ease;
   pointer-events: none;
@@ -508,7 +511,11 @@ body::after {
   content: "";
   position: absolute;
   inset: 0;
-  background: radial-gradient(circle at 100% 0%, rgba(110, 215, 255, 0.18), transparent 50%);
+  background: radial-gradient(
+    circle at var(--mx, 70%) var(--my, 10%),
+    rgba(110, 215, 255, 0.2),
+    transparent 55%
+  );
   pointer-events: none;
 }
 

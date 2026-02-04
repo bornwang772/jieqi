@@ -433,6 +433,24 @@ function setupParallax() {
   });
 }
 
+function setupCardHover() {
+  const cards = document.querySelectorAll(".bento-card");
+  cards.forEach((card) => {
+    card.addEventListener("mousemove", (event) => {
+      const rect = card.getBoundingClientRect();
+      const x = ((event.clientX - rect.left) / rect.width) * 100;
+      const y = ((event.clientY - rect.top) / rect.height) * 100;
+      card.style.setProperty("--mx", `${x.toFixed(1)}%`);
+      card.style.setProperty("--my", `${y.toFixed(1)}%`);
+    });
+
+    card.addEventListener("mouseleave", () => {
+      card.style.removeProperty("--mx");
+      card.style.removeProperty("--my");
+    });
+  });
+}
+
 svg.addEventListener("click", (event) => {
   const target = event.target;
   if (!target.closest || !target.closest(".term")) {
@@ -450,3 +468,4 @@ buildTermGrid();
 placeSun();
 animateEarth();
 setupParallax();
+setupCardHover();
