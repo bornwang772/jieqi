@@ -10,6 +10,13 @@
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
+  <div class="rotate-hint" role="alert">
+    <div class="rotate-hint__card">
+      <div class="rotate-hint__title">请横屏观看</div>
+      <div class="rotate-hint__desc">为了显示完整轨道与节气信息，请将设备旋转为横屏。</div>
+    </div>
+  </div>
+
   <div class="atmosphere" aria-hidden="true">
     <span class="orb orb--1"></span>
     <span class="orb orb--2"></span>
@@ -18,31 +25,18 @@
   </div>
 
   <div class="app">
-    <header class="hero">
-      <div class="hero__text">
-        <p class="hero__tag">顶视图 · 椭圆轨道 · 太阳黄经</p>
-        <h1>地球绕太阳公转与 24 节气</h1>
-        <p class="hero__subtitle">
-          以椭圆轨道与角度刻度呈现节气位置。点击节气标记，了解其含义与时间范围。
-        </p>
-      </div>
-      <div class="hero__note bento-card">
-        <div class="note__title">解读方式</div>
-        <div class="note__line">0° 在右侧水平轴，逆时针递增</div>
-        <div class="note__line">刻度每 15°，数字每 30°</div>
-        <div class="note__line">太阳位于椭圆焦点</div>
-      </div>
-    </header>
-
     <main class="layout">
       <section class="visual bento-card" aria-label="地球公转轨道可视化">
         <div class="visual__header">
-          <h2>轨道与节气位置</h2>
-          <span class="chip">可点击节气</span>
+          <div class="title-group">
+            <p class="hero__tag">顶视图 · 椭圆轨道 · 太阳黄经</p>
+            <h1>地球绕太阳公转与 24 节气</h1>
+          </div>
+          <span class="chip">点击节气</span>
         </div>
 
         <div class="visual__stage">
-          <svg id="orbitSvg" viewBox="-480 -340 960 680" role="img" aria-label="椭圆轨道与节气标记">
+          <svg id="orbitSvg" viewBox="-520 -380 1040 760" role="img" aria-label="椭圆轨道与节气标记">
             <defs>
               <radialGradient id="sunGlow" cx="50%" cy="50%" r="50%">
                 <stop offset="0%" stop-color="#ffe29a" />
@@ -93,11 +87,17 @@
             </g>
 
             <g id="earth" class="earth" filter="url(#softGlow)">
-              <circle r="12" class="earth__core" />
-              <circle r="26" class="earth__glow" />
-              <text class="earth__label" x="0" y="-24">地球</text>
+              <circle r="14" class="earth__core" />
+              <circle r="32" class="earth__glow" />
+              <text class="earth__label" x="0" y="-26">地球</text>
             </g>
           </svg>
+
+          <div class="orbit__hint" aria-hidden="true">
+            <div>0° 在右侧水平轴，逆时针递增</div>
+            <div>刻度每 15°，数字每 30°</div>
+            <div>太阳位于椭圆焦点</div>
+          </div>
         </div>
 
         <div class="legend">
@@ -107,13 +107,13 @@
         </div>
       </section>
 
-      <aside class="panel">
-        <div class="panel__header bento-card span-2">
+      <aside class="panel" aria-live="polite">
+        <div class="panel__header bento-card">
           <h2>节气卡片</h2>
           <p>点击轨道上的任意节气标记查看详情。</p>
         </div>
 
-        <div id="termCard" class="term-card bento-card span-2 is-empty">
+        <div id="termCard" class="term-card bento-card is-empty">
           <div class="term-card__header">
             <div>
               <div class="term-card__label">当前选择</div>
@@ -135,19 +135,7 @@
           </div>
         </div>
 
-        <div class="mini-card bento-card">
-          <div class="mini-card__title">轨道参数</div>
-          <div class="mini-card__value">a=300 / b=180</div>
-          <div class="mini-card__desc">椭圆示意，太阳位于焦点。</div>
-        </div>
-
-        <div class="mini-card bento-card">
-          <div class="mini-card__title">角度规则</div>
-          <div class="mini-card__value">每 15° 一刻度</div>
-          <div class="mini-card__desc">点击节气显示角度指示线。</div>
-        </div>
-
-        <div class="term-grid bento-card span-2">
+        <div class="term-grid bento-card">
           <div class="term-grid__title">节气速览</div>
           <div id="termGrid" class="term-grid__list" aria-label="节气快速选择"></div>
         </div>
