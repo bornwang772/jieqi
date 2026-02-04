@@ -180,6 +180,10 @@ const ticksGroup = document.getElementById("ticks");
 const termsGroup = document.getElementById("terms");
 const earthGroup = document.getElementById("earth");
 const sunGroup = document.querySelector(".sun");
+const indicatorGroup = document.getElementById("indicator");
+const indicatorLine = document.getElementById("indicatorLine");
+const indicatorDot = document.getElementById("indicatorDot");
+const termGrid = document.getElementById("termGrid");
 
 const card = {
   root: document.getElementById("termCard"),
@@ -200,11 +204,11 @@ function svgEl(tag, attrs = {}) {
   return element;
 }
 
-function pointAtAngle(angleDeg) {
+function pointOnEllipse(angleDeg, rx = a, ry = b) {
   const rad = (angleDeg * Math.PI) / 180;
   const cos = Math.cos(rad);
   const sin = Math.sin(rad);
-  const r = 1 / Math.sqrt((cos * cos) / (a * a) + (sin * sin) / (b * b));
+  const r = 1 / Math.sqrt((cos * cos) / (rx * rx) + (sin * sin) / (ry * ry));
   return {
     x: r * cos,
     y: -r * sin,
@@ -218,7 +222,7 @@ function buildTicks() {
     const isMajor = angle % 90 === 0;
     const isMedium = angle % 30 === 0;
     const length = isMajor ? 18 : isMedium ? 12 : 8;
-    const { x, y, dx, dy } = pointAtAngle(angle);
+    const { x, y, dx, dy } = pointOnEllipse(angle, a, b);
 
     const tick = svgEl("line", {
       x1: x,
@@ -249,39 +253,46 @@ function buildTicks() {
 
 function buildTerms() {
   termData.forEach((term, index) => {
-    const { x, y, dx, dy } = pointAtAngle(term.angle);
-    const labelOffset = 18;
-    const lx = x + dx * labelOffset;
-    const ly = y + dy * labelOffset;
+    const point = pointOnEllipse(term.angle, a, b);
+    const labelPoint = pointOnEllipse(term.angle, a + 36, b + 26);
 
     const group = svgEl("g", {
       class: "term",
       "data-index": index,
       tabindex: "0",
       role: "button",
-      "aria-label": `${term.name}，太阳黄经 ${term.angle} 度",
+      "aria-label": `${term.name}，太阳黄经 ${term.angle} 度`,
     });
 
     const title = svgEl("title");
     title.textContent = `${term.name} | ${term.angle}°`;
 
+    const line = svgEl("line", {
+      x1: point.x,
+      y1: point.y,
+      x2: labelPoint.x,
+      y2: labelPoint.y,
+      class: "term-line",
+    });
+
     const circle = svgEl("circle", {
-      cx: x,
-      cy: y,
-      r: 4.5,
+      cx: point.x,
+      cy: point.y,
+      r: 5.5,
       class: "term-circle",
     });
 
     const label = svgEl("text", {
-      x: lx,
-      y: ly,
-      "text-anchor": Math.abs(dx) < 0.3 ? "middle" : dx > 0 ? "start" : "end",
+      x: labelPoint.x,
+      y: labelPoint.y,
+      "text-anchor": Math.abs(point.dx) < 0.3 ? "middle" : point.dx > 0 ? "start" : "end",
       "dominant-baseline": "middle",
       class: "term-label",
     });
     label.textContent = term.name;
 
     group.appendChild(title);
+    group.appendChild(line);
     group.appendChild(circle);
     group.appendChild(label);
     termsGroup.appendChild(group);
@@ -300,17 +311,33 @@ function buildTerms() {
   });
 }
 
+function buildTermGrid() {
+  termData.forEach((term, index) => {
+    const button = document.createElement("button");
+    button.className = "term-chip";
+    button.textContent = term.name;
+    button.setAttribute("type", "button");
+    button.setAttribute("data-index", index);
+    button.addEventListener("click", () => selectTerm(index));
+    termGrid.appendChild(button);
+  });
+}
+
 let activeIndex = null;
 
 function selectTerm(index) {
   if (activeIndex !== null) {
     const prev = termsGroup.querySelector(`.term[data-index="${activeIndex}"]`);
     if (prev) prev.classList.remove("active");
+    const prevChip = termGrid.querySelector(`.term-chip[data-index="${activeIndex}"]`);
+    if (prevChip) prevChip.classList.remove("active");
   }
 
   activeIndex = index;
   const next = termsGroup.querySelector(`.term[data-index="${index}"]`);
   if (next) next.classList.add("active");
+  const nextChip = termGrid.querySelector(`.term-chip[data-index="${index}"]`);
+  if (nextChip) nextChip.classList.add("active");
 
   const term = termData[index];
   card.root.classList.remove("is-empty");
@@ -319,12 +346,16 @@ function selectTerm(index) {
   card.desc.textContent = term.desc;
   card.range.textContent = term.range;
   card.season.textContent = term.season;
+
+  updateIndicator(term.angle);
 }
 
 function clearTerm() {
   if (activeIndex !== null) {
     const prev = termsGroup.querySelector(`.term[data-index="${activeIndex}"]`);
     if (prev) prev.classList.remove("active");
+    const prevChip = termGrid.querySelector(`.term-chip[data-index="${activeIndex}"]`);
+    if (prevChip) prevChip.classList.remove("active");
   }
   activeIndex = null;
   card.root.classList.add("is-empty");
@@ -333,6 +364,18 @@ function clearTerm() {
   card.desc.textContent = "点击节气标记，了解其在地球公转中的位置与含义。";
   card.range.textContent = "—";
   card.season.textContent = "—";
+  indicatorGroup.style.opacity = "0";
+}
+
+function updateIndicator(angleDeg) {
+  const point = pointOnEllipse(angleDeg, a, b);
+  indicatorLine.setAttribute("x1", focus);
+  indicatorLine.setAttribute("y1", 0);
+  indicatorLine.setAttribute("x2", point.x);
+  indicatorLine.setAttribute("y2", point.y);
+  indicatorDot.setAttribute("cx", point.x);
+  indicatorDot.setAttribute("cy", point.y);
+  indicatorGroup.style.opacity = "1";
 }
 
 function placeSun() {
@@ -341,7 +384,7 @@ function placeSun() {
 
 function animateEarth() {
   let start = null;
-  const period = 24000;
+  const period = 26000;
 
   function step(timestamp) {
     if (!start) start = timestamp;
@@ -369,5 +412,6 @@ closeBtn.addEventListener("click", () => {
 
 buildTicks();
 buildTerms();
+buildTermGrid();
 placeSun();
 animateEarth();

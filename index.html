@@ -6,13 +6,13 @@
   <title>节气公转可视化</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&family=ZCOOL+XiaoWei&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&family=Noto+Serif+SC:wght@500;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
   <div class="app">
     <header class="hero">
-      <div>
+      <div class="hero__text">
         <p class="hero__tag">顶视图 · 椭圆轨道 · 太阳黄经</p>
         <h1>地球绕太阳公转与 24 节气</h1>
         <p class="hero__subtitle">
@@ -35,20 +35,20 @@
         </div>
 
         <div class="visual__stage">
-          <svg id="orbitSvg" viewBox="-420 -280 840 560" role="img" aria-label="椭圆轨道与节气标记">
+          <svg id="orbitSvg" viewBox="-480 -340 960 680" role="img" aria-label="椭圆轨道与节气标记">
             <defs>
               <radialGradient id="sunGlow" cx="50%" cy="50%" r="50%">
-                <stop offset="0%" stop-color="#ffd36a" />
+                <stop offset="0%" stop-color="#ffe29a" />
                 <stop offset="65%" stop-color="#ffb23f" />
                 <stop offset="100%" stop-color="#ff8a3d" />
               </radialGradient>
               <radialGradient id="earthGlow" cx="50%" cy="50%" r="50%">
-                <stop offset="0%" stop-color="#8bd4ff" stop-opacity="0.9" />
-                <stop offset="100%" stop-color="#2155ff" stop-opacity="0.2" />
+                <stop offset="0%" stop-color="#a4e5ff" stop-opacity="0.95" />
+                <stop offset="100%" stop-color="#1b5bff" stop-opacity="0.25" />
               </radialGradient>
               <linearGradient id="orbitStroke" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stop-color="#7bd4ff" stop-opacity="0.9" />
-                <stop offset="100%" stop-color="#7bffa6" stop-opacity="0.25" />
+                <stop offset="0%" stop-color="#7be3ff" stop-opacity="0.95" />
+                <stop offset="100%" stop-color="#7bffbf" stop-opacity="0.22" />
               </linearGradient>
               <filter id="softGlow" x="-50%" y="-50%" width="200%" height="200%">
                 <feGaussianBlur stdDeviation="6" result="blur" />
@@ -62,24 +62,30 @@
             <g id="orbitBase" class="orbit">
               <ellipse cx="0" cy="0" rx="300" ry="180" class="orbit__ring" />
               <ellipse cx="0" cy="0" rx="300" ry="180" class="orbit__halo" />
+              <ellipse cx="0" cy="0" rx="350" ry="210" class="orbit__grid" />
             </g>
 
             <g id="axis" class="axis">
-              <line x1="-330" y1="0" x2="330" y2="0" />
-              <line x1="0" y1="-210" x2="0" y2="210" />
+              <line x1="-360" y1="0" x2="360" y2="0" />
+              <line x1="0" y1="-240" x2="0" y2="240" />
             </g>
 
             <g id="ticks" class="ticks"></g>
+            <g id="indicator" class="indicator">
+              <line id="indicatorLine" x1="0" y1="0" x2="0" y2="0" />
+              <circle id="indicatorDot" r="6" />
+            </g>
             <g id="terms" class="terms"></g>
 
             <g class="sun" filter="url(#softGlow)">
-              <circle id="sun" r="26" />
-              <circle r="46" class="sun__halo" />
+              <circle id="sun" r="30" />
+              <circle r="54" class="sun__halo" />
             </g>
 
             <g id="earth" class="earth" filter="url(#softGlow)">
-              <circle r="8" class="earth__core" />
-              <circle r="16" class="earth__glow" />
+              <circle r="12" class="earth__core" />
+              <circle r="26" class="earth__glow" />
+              <text class="earth__label" x="0" y="-22">地球</text>
             </g>
           </svg>
         </div>
@@ -117,6 +123,11 @@
               <div id="termSeason" class="meta__value">—</div>
             </div>
           </div>
+        </div>
+
+        <div class="term-grid">
+          <div class="term-grid__title">节气速览</div>
+          <div id="termGrid" class="term-grid__list" aria-label="节气快速选择"></div>
         </div>
       </aside>
     </main>
