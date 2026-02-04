@@ -10,13 +10,6 @@
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-  <div class="rotate-hint" role="alert">
-    <div class="rotate-hint__card">
-      <div class="rotate-hint__title">请横屏观看</div>
-      <div class="rotate-hint__desc">为了显示完整轨道与节气信息，请将设备旋转为横屏。</div>
-    </div>
-  </div>
-
   <div class="atmosphere" aria-hidden="true">
     <span class="orb orb--1"></span>
     <span class="orb orb--2"></span>
@@ -31,6 +24,9 @@
           <div class="title-group">
             <p class="hero__tag">顶视图 · 椭圆轨道 · 太阳黄经</p>
             <h1>地球绕太阳公转与 24 节气</h1>
+            <p class="hero__subtitle">
+              观察地球公转轨道上的节气位置与太阳黄经，理解季节与温度变化。
+            </p>
           </div>
           <span class="chip">点击节气</span>
         </div>
@@ -133,6 +129,15 @@
               <div id="termSeason" class="meta__value">—</div>
             </div>
           </div>
+        </div>
+
+        <div class="info-card bento-card">
+          <div class="info-card__title">温度与公转/自转的关系</div>
+          <ul class="info-card__list">
+            <li>自转导致昼夜更替，形成日内温度变化。</li>
+            <li>公转叠加地轴倾角，形成四季与年内温度起伏。</li>
+            <li>近日点/远日点影响较小，季节主因仍是地轴倾角。</li>
+          </ul>
         </div>
 
         <div class="term-grid bento-card">

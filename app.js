@@ -254,7 +254,7 @@ function buildTicks() {
 function buildTerms() {
   termData.forEach((term, index) => {
     const point = pointOnEllipse(term.angle, a, b);
-    const labelPoint = pointOnEllipse(term.angle, a + 58, b + 42);
+    const labelPoint = pointOnEllipse(term.angle, a + 62, b + 46);
 
     const group = svgEl("g", {
       class: "term",
@@ -373,12 +373,24 @@ function clearTerm() {
 
 function updateIndicator(angleDeg) {
   const point = pointOnEllipse(angleDeg, a, b);
-  indicatorLine.setAttribute("x1", focus);
-  indicatorLine.setAttribute("y1", 0);
-  indicatorLine.setAttribute("x2", point.x);
-  indicatorLine.setAttribute("y2", point.y);
-  indicatorDot.setAttribute("cx", point.x);
-  indicatorDot.setAttribute("cy", point.y);
+  const vx = point.x - focus;
+  const vy = point.y;
+  const len = Math.hypot(vx, vy) || 1;
+  const ux = vx / len;
+  const uy = vy / len;
+  const sunRadius = 34;
+  const termRadius = 8;
+  const startX = focus + ux * sunRadius;
+  const startY = 0 + uy * sunRadius;
+  const endX = point.x - ux * termRadius;
+  const endY = point.y - uy * termRadius;
+
+  indicatorLine.setAttribute("x1", startX);
+  indicatorLine.setAttribute("y1", startY);
+  indicatorLine.setAttribute("x2", endX);
+  indicatorLine.setAttribute("y2", endY);
+  indicatorDot.setAttribute("cx", endX);
+  indicatorDot.setAttribute("cy", endY);
   indicatorGroup.classList.add("is-visible");
 }
 
