@@ -254,7 +254,7 @@ function buildTicks() {
 function buildTerms() {
   termData.forEach((term, index) => {
     const point = pointOnEllipse(term.angle, a, b);
-    const labelPoint = pointOnEllipse(term.angle, a + 36, b + 26);
+    const labelPoint = pointOnEllipse(term.angle, a + 58, b + 42);
 
     const group = svgEl("g", {
       class: "term",
@@ -263,6 +263,9 @@ function buildTerms() {
       role: "button",
       "aria-label": `${term.name}，太阳黄经 ${term.angle} 度`,
     });
+
+    group.style.setProperty("--float-delay", `${index * 0.08}s`);
+    group.style.setProperty("--pop-delay", `${index * 0.03}s`);
 
     const title = svgEl("title");
     title.textContent = `${term.name} | ${term.angle}°`;
@@ -278,7 +281,7 @@ function buildTerms() {
     const circle = svgEl("circle", {
       cx: point.x,
       cy: point.y,
-      r: 5.5,
+      r: 5.8,
       class: "term-circle",
     });
 
@@ -318,6 +321,7 @@ function buildTermGrid() {
     button.textContent = term.name;
     button.setAttribute("type", "button");
     button.setAttribute("data-index", index);
+    button.style.setProperty("--pop-delay", `${0.2 + index * 0.02}s`);
     button.addEventListener("click", () => selectTerm(index));
     termGrid.appendChild(button);
   });
@@ -364,7 +368,7 @@ function clearTerm() {
   card.desc.textContent = "点击节气标记，了解其在地球公转中的位置与含义。";
   card.range.textContent = "—";
   card.season.textContent = "—";
-  indicatorGroup.style.opacity = "0";
+  indicatorGroup.classList.remove("is-visible");
 }
 
 function updateIndicator(angleDeg) {
@@ -375,7 +379,7 @@ function updateIndicator(angleDeg) {
   indicatorLine.setAttribute("y2", point.y);
   indicatorDot.setAttribute("cx", point.x);
   indicatorDot.setAttribute("cy", point.y);
-  indicatorGroup.style.opacity = "1";
+  indicatorGroup.classList.add("is-visible");
 }
 
 function placeSun() {
@@ -399,6 +403,24 @@ function animateEarth() {
   requestAnimationFrame(step);
 }
 
+function setupParallax() {
+  const stage = document.querySelector(".visual__stage");
+  if (!stage) return;
+
+  stage.addEventListener("mousemove", (event) => {
+    const rect = stage.getBoundingClientRect();
+    const x = (event.clientX - rect.left) / rect.width - 0.5;
+    const y = (event.clientY - rect.top) / rect.height - 0.5;
+    const offsetX = x * 10;
+    const offsetY = y * 10;
+    svg.style.transform = `translate(${offsetX}px, ${offsetY}px)`;
+  });
+
+  stage.addEventListener("mouseleave", () => {
+    svg.style.transform = "translate(0, 0)";
+  });
+}
+
 svg.addEventListener("click", (event) => {
   const target = event.target;
   if (!target.closest || !target.closest(".term")) {
@@ -415,3 +437,4 @@ buildTerms();
 buildTermGrid();
 placeSun();
 animateEarth();
+setupParallax();
