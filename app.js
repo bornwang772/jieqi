@@ -182,8 +182,10 @@ const earthGroup = document.getElementById("earth");
 const sunGroup = document.querySelector(".sun");
 const indicatorGroup = document.getElementById("indicator");
 const indicatorLine = document.getElementById("indicatorLine");
-const indicatorDot = document.getElementById("indicatorDot");
+const indicatorAngleText = document.getElementById("indicatorAngle");
 const termGrid = document.getElementById("termGrid");
+const hudAngle = document.getElementById("hudAngle");
+const hudTerm = document.getElementById("hudTerm");
 
 const card = {
   root: document.getElementById("termCard"),
@@ -270,12 +272,41 @@ function buildTerms() {
     const title = svgEl("title");
     title.textContent = `${term.name} | ${term.angle}°`;
 
+    // Bigger hit targets for mobile: tap near dot/label also works.
+    const hitDot = svgEl("circle", {
+      cx: point.x,
+      cy: point.y,
+      r: 18,
+      class: "term-hit",
+    });
+
+    const hitLabel = svgEl("circle", {
+      cx: labelPoint.x,
+      cy: labelPoint.y,
+      r: 22,
+      class: "term-hit",
+    });
+
     const line = svgEl("line", {
       x1: point.x,
       y1: point.y,
       x2: labelPoint.x,
       y2: labelPoint.y,
       class: "term-line",
+    });
+
+    const aura2 = svgEl("circle", {
+      cx: point.x,
+      cy: point.y,
+      r: 16,
+      class: "term-aura2",
+    });
+
+    const aura = svgEl("circle", {
+      cx: point.x,
+      cy: point.y,
+      r: 11,
+      class: "term-aura",
     });
 
     const circle = svgEl("circle", {
@@ -295,20 +326,24 @@ function buildTerms() {
     label.textContent = term.name;
 
     group.appendChild(title);
+    group.appendChild(hitDot);
+    group.appendChild(hitLabel);
     group.appendChild(line);
+    group.appendChild(aura2);
+    group.appendChild(aura);
     group.appendChild(circle);
     group.appendChild(label);
     termsGroup.appendChild(group);
 
     group.addEventListener("click", (event) => {
       event.stopPropagation();
-      selectTerm(index);
+      selectTerm(index, { jumpEarth: true });
     });
 
     group.addEventListener("keydown", (event) => {
       if (event.key === "Enter" || event.key === " ") {
         event.preventDefault();
-        selectTerm(index);
+        selectTerm(index, { jumpEarth: true });
       }
     });
   });
@@ -322,14 +357,15 @@ function buildTermGrid() {
     button.setAttribute("type", "button");
     button.setAttribute("data-index", index);
     button.style.setProperty("--pop-delay", `${0.2 + index * 0.02}s`);
-    button.addEventListener("click", () => selectTerm(index));
+    button.addEventListener("click", () => selectTerm(index, { jumpEarth: true }));
     termGrid.appendChild(button);
   });
 }
 
 let activeIndex = null;
 
-function selectTerm(index) {
+function selectTerm(index, options = {}) {
+  const { jumpEarth = false } = options;
   if (activeIndex !== null) {
     const prev = termsGroup.querySelector(`.term[data-index="${activeIndex}"]`);
     if (prev) prev.classList.remove("active");
@@ -351,7 +387,11 @@ function selectTerm(index) {
   card.range.textContent = term.range;
   card.season.textContent = term.season;
 
-  updateIndicator(term.angle);
+  if (hudTerm) hudTerm.textContent = term.name;
+
+  if (jumpEarth) {
+    orbitStepper.jumpTo(index);
+  }
 }
 
 function clearTerm() {
@@ -368,56 +408,173 @@ function clearTerm() {
   card.desc.textContent = "点击节气标记，了解其在地球公转中的位置与含义。";
   card.range.textContent = "—";
   card.season.textContent = "—";
-  indicatorGroup.classList.remove("is-visible");
 }
 
-function updateIndicator(angleDeg) {
-  const point = pointOnEllipse(angleDeg, a, b);
-  indicatorLine.setAttribute("x1", focus);
-  indicatorLine.setAttribute("y1", 0);
-  indicatorLine.setAttribute("x2", point.x);
-  indicatorLine.setAttribute("y2", point.y);
-  indicatorDot.setAttribute("cx", point.x);
-  indicatorDot.setAttribute("cy", point.y);
-  indicatorGroup.classList.add("is-visible");
+function formatAngle(angleDeg, decimals = 1) {
+  const normalized = ((angleDeg % 360) + 360) % 360;
+  if (Number.isInteger(normalized)) return `${normalized}°`;
+  return `${normalized.toFixed(decimals)}°`;
 }
 
 function placeSun() {
   sunGroup.setAttribute("transform", `translate(${focus}, 0)`);
 }
 
-function animateEarth() {
-  let start = null;
-  const period = 26000;
+function updateSunEarthLink(earthX, earthY, angleDeg, labelMode) {
+  indicatorLine.setAttribute("x1", focus);
+  indicatorLine.setAttribute("y1", 0);
+  indicatorLine.setAttribute("x2", earthX);
+  indicatorLine.setAttribute("y2", earthY);
 
-  function step(timestamp) {
-    if (!start) start = timestamp;
-    const progress = (timestamp - start) % period;
-    const angle = (progress / period) * Math.PI * 2;
-    const x = a * Math.cos(angle);
-    const y = -b * Math.sin(angle);
-    earthGroup.setAttribute("transform", `translate(${x}, ${y})`);
-    requestAnimationFrame(step);
+  if (indicatorAngleText) {
+    const vx = earthX - focus;
+    const vy = earthY;
+    const len = Math.hypot(vx, vy) || 1;
+    const ux = vx / len;
+    const uy = vy / len;
+    const offset = 26;
+    const tx = earthX + ux * offset;
+    const ty = earthY + uy * offset;
+    indicatorAngleText.setAttribute("x", tx);
+    indicatorAngleText.setAttribute("y", ty);
+    indicatorAngleText.textContent = formatAngle(angleDeg, 1);
+    indicatorAngleText.setAttribute("text-anchor", "middle");
+    indicatorAngleText.setAttribute("dominant-baseline", "middle");
+
+    indicatorAngleText.classList.toggle("indicator__text--muted", labelMode === "move");
   }
 
-  requestAnimationFrame(step);
+  if (hudAngle) {
+    hudAngle.textContent = labelMode === "hold" ? formatAngle(angleDeg, 0) : formatAngle(angleDeg, 1);
+  }
 }
 
-function setupParallax() {
+const orbitStepper = (() => {
+  const HOLD_MS = 3000;
+  const MOVE_MS = 1400;
+  const GOLDEN_Y = 0.382;
+
+  const state = {
+    idx: 0,
+    phase: "hold",
+    phaseStart: 0,
+    startAngle: termData[0].angle,
+    endAngle: termData[1].angle,
+    nextIdx: 1,
+    angle: termData[0].angle,
+    lastNow: 0,
+  };
+
+  function easeInOutCubic(t) {
+    return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+  }
+
+  function enterHold(now) {
+    state.phase = "hold";
+    state.phaseStart = now;
+    state.angle = termData[state.idx].angle;
+    selectTerm(state.idx, { jumpEarth: false });
+  }
+
+  function enterMove(now) {
+    state.phase = "move";
+    state.phaseStart = now;
+    state.startAngle = termData[state.idx].angle;
+    state.nextIdx = (state.idx + 1) % termData.length;
+    state.endAngle = termData[state.nextIdx].angle;
+    if (state.endAngle <= state.startAngle) state.endAngle += 360;
+  }
+
+  function updateEarthAtAngle(angleDeg, labelMode) {
+    const point = pointOnEllipse(angleDeg, a, b);
+    earthGroup.setAttribute("transform", `translate(${point.x}, ${point.y})`);
+    updateSunEarthLink(point.x, point.y, angleDeg, labelMode);
+  }
+
+  function tick(now) {
+    if (!state.phaseStart) state.phaseStart = now;
+    state.lastNow = now;
+
+    if (state.phase === "hold") {
+      const elapsed = now - state.phaseStart;
+      updateEarthAtAngle(state.angle, "hold");
+      if (elapsed >= HOLD_MS) enterMove(now);
+    } else {
+      const t = Math.min(1, (now - state.phaseStart) / MOVE_MS);
+      const eased = easeInOutCubic(t);
+      const angle = state.startAngle + (state.endAngle - state.startAngle) * eased;
+      state.angle = ((angle % 360) + 360) % 360;
+      updateEarthAtAngle(state.angle, "move");
+
+      if (t >= 1) {
+        state.idx = state.nextIdx;
+        enterHold(now);
+      }
+    }
+
+    requestAnimationFrame(tick);
+  }
+
+  function jumpTo(index) {
+    const clamped = ((index % termData.length) + termData.length) % termData.length;
+    state.idx = clamped;
+    state.angle = termData[clamped].angle;
+    enterHold(state.lastNow || performance.now());
+    updateEarthAtAngle(state.angle, "hold");
+  }
+
+  return {
+    start() {
+      const now = performance.now();
+      state.phaseStart = now;
+      enterHold(now);
+      updateEarthAtAngle(state.angle, "hold");
+      requestAnimationFrame(tick);
+    },
+    jumpTo,
+    GOLDEN_Y,
+  };
+})();
+
+function setupGoldenPositioning() {
   const stage = document.querySelector(".visual__stage");
   if (!stage) return;
+
+  const base = { x: 0, y: 0 };
+  const parallax = { x: 0, y: 0 };
+
+  function updateTransform() {
+    const x = base.x + parallax.x;
+    const y = base.y + parallax.y;
+    svg.style.transform = `translate(${x.toFixed(2)}px, ${y.toFixed(2)}px)`;
+  }
+
+  function updateGolden() {
+    const rect = stage.getBoundingClientRect();
+    base.x = 0;
+    base.y = (orbitStepper.GOLDEN_Y - 0.5) * rect.height;
+    updateTransform();
+  }
+
+  updateGolden();
+  window.addEventListener("resize", updateGolden);
+
+  const supportsParallax = window.matchMedia("(pointer: fine)").matches && window.matchMedia("(hover: hover)").matches;
+  if (!supportsParallax) return;
 
   stage.addEventListener("mousemove", (event) => {
     const rect = stage.getBoundingClientRect();
     const x = (event.clientX - rect.left) / rect.width - 0.5;
     const y = (event.clientY - rect.top) / rect.height - 0.5;
-    const offsetX = x * 10;
-    const offsetY = y * 10;
-    svg.style.transform = `translate(${offsetX}px, ${offsetY}px)`;
+    parallax.x = x * 8;
+    parallax.y = y * 8;
+    updateTransform();
   });
 
   stage.addEventListener("mouseleave", () => {
-    svg.style.transform = "translate(0, 0)";
+    parallax.x = 0;
+    parallax.y = 0;
+    updateTransform();
   });
 }
 
@@ -425,6 +582,7 @@ function setupParallax() {
 svg.addEventListener("click", (event) => {
   const target = event.target;
   if (!target.closest || !target.closest(".term")) {
+    // Keep orbit running; clicking empty space only dismisses the card.
     clearTerm();
   }
 });
@@ -437,5 +595,5 @@ buildTicks();
 buildTerms();
 buildTermGrid();
 placeSun();
-animateEarth();
-setupParallax();
+orbitStepper.start();
+setupGoldenPositioning();

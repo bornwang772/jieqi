@@ -32,7 +32,7 @@
         </div>
 
         <div class="visual__stage">
-          <svg id="orbitSvg" viewBox="-520 -380 1040 760" role="img" aria-label="椭圆轨道与节气标记">
+          <svg id="orbitSvg" viewBox="-520 -420 1040 820" role="img" aria-label="椭圆轨道与节气标记">
             <defs>
               <radialGradient id="sunGlow" cx="50%" cy="50%" r="50%">
                 <stop offset="0%" stop-color="#ffe29a" />
@@ -72,7 +72,7 @@
 
             <g id="indicator" class="indicator" aria-hidden="true">
               <line id="indicatorLine" x1="0" y1="0" x2="0" y2="0" />
-              <circle id="indicatorDot" r="6" />
+              <text id="indicatorAngle" class="indicator__text" x="0" y="0">--°</text>
             </g>
 
             <g id="terms" class="terms"></g>
@@ -93,6 +93,17 @@
             <div>0° 在右侧水平轴，逆时针递增</div>
             <div>刻度每 15°，数字每 30°</div>
             <div>太阳位于椭圆焦点</div>
+          </div>
+
+          <div class="hud" aria-hidden="true">
+            <div class="hud__row">
+              <div class="hud__label">实时角度</div>
+              <div id="hudAngle" class="hud__value">--°</div>
+            </div>
+            <div class="hud__row">
+              <div class="hud__label">当前节气</div>
+              <div id="hudTerm" class="hud__value">—</div>
+            </div>
           </div>
         </div>
 
