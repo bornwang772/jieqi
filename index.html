@@ -19,7 +19,7 @@
 
   <div class="app">
     <main class="layout">
-      <section class="visual bento-card" aria-label="地球公转轨道可视化">
+      <section class="visual bento-card bento-card--dark" aria-label="地球公转轨道可视化">
         <div class="visual__header">
           <div class="title-group">
             <p class="hero__tag">顶视图 · 椭圆轨道 · 太阳黄经</p>
@@ -32,7 +32,7 @@
         </div>
 
         <div class="visual__stage">
-          <svg id="orbitSvg" viewBox="-520 -420 1040 820" role="img" aria-label="椭圆轨道与节气标记">
+          <svg id="orbitSvg" viewBox="-370 -285 740 570" role="img" aria-label="椭圆轨道与节气标记">
             <defs>
               <radialGradient id="sunGlow" cx="50%" cy="50%" r="50%">
                 <stop offset="0%" stop-color="#ffe29a" />
@@ -71,6 +71,7 @@
             <g id="ticks" class="ticks"></g>
 
             <g id="indicator" class="indicator" aria-hidden="true">
+              <line id="indicatorLineBack" x1="0" y1="0" x2="0" y2="0" />
               <line id="indicatorLine" x1="0" y1="0" x2="0" y2="0" />
               <text id="indicatorAngle" class="indicator__text" x="0" y="0">--°</text>
             </g>
@@ -115,12 +116,12 @@
       </section>
 
       <aside class="panel" aria-live="polite">
-        <div class="panel__header bento-card">
+        <div class="panel__header bento-card bento-card--light">
           <h2>节气卡片</h2>
           <p>点击轨道上的任意节气标记查看详情。</p>
         </div>
 
-        <div id="termCard" class="term-card bento-card is-empty">
+        <div id="termCard" class="term-card bento-card bento-card--light is-empty">
           <div class="term-card__header">
             <div>
               <div class="term-card__label">当前选择</div>
@@ -142,7 +143,7 @@
           </div>
         </div>
 
-        <div class="info-card bento-card">
+        <div class="info-card bento-card bento-card--light">
           <div class="info-card__title">温度与公转/自转的关系</div>
           <ul class="info-card__list">
             <li>自转导致昼夜更替，形成日内温度变化。</li>
@@ -151,7 +152,7 @@
           </ul>
         </div>
 
-        <div class="term-grid bento-card">
+        <div class="term-grid bento-card bento-card--light">
           <div class="term-grid__title">节气速览</div>
           <div id="termGrid" class="term-grid__list" aria-label="节气快速选择"></div>
         </div>

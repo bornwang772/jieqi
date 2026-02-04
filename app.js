@@ -181,6 +181,7 @@ const termsGroup = document.getElementById("terms");
 const earthGroup = document.getElementById("earth");
 const sunGroup = document.querySelector(".sun");
 const indicatorGroup = document.getElementById("indicator");
+const indicatorLineBack = document.getElementById("indicatorLineBack");
 const indicatorLine = document.getElementById("indicatorLine");
 const indicatorAngleText = document.getElementById("indicatorAngle");
 const termGrid = document.getElementById("termGrid");
@@ -237,7 +238,9 @@ function buildTicks() {
     ticksGroup.appendChild(tick);
 
     if (isMedium) {
-      const labelOffset = length + (isMajor ? 18 : 12);
+      // Keep degree labels slightly closer so term labels have room on smaller viewBoxes.
+      const extra = isMajor ? 14 : 10;
+      const labelOffset = length + extra;
       const lx = x + dx * labelOffset;
       const ly = y + dy * labelOffset;
       const text = svgEl("text", {
@@ -256,7 +259,7 @@ function buildTicks() {
 function buildTerms() {
   termData.forEach((term, index) => {
     const point = pointOnEllipse(term.angle, a, b);
-    const labelPoint = pointOnEllipse(term.angle, a + 62, b + 46);
+    const labelPoint = pointOnEllipse(term.angle, a + 46, b + 34);
 
     const group = svgEl("g", {
       class: "term",
@@ -277,13 +280,6 @@ function buildTerms() {
       cx: point.x,
       cy: point.y,
       r: 18,
-      class: "term-hit",
-    });
-
-    const hitLabel = svgEl("circle", {
-      cx: labelPoint.x,
-      cy: labelPoint.y,
-      r: 22,
       class: "term-hit",
     });
 
@@ -327,13 +323,31 @@ function buildTerms() {
 
     group.appendChild(title);
     group.appendChild(hitDot);
-    group.appendChild(hitLabel);
     group.appendChild(line);
     group.appendChild(aura2);
     group.appendChild(aura);
     group.appendChild(circle);
     group.appendChild(label);
     termsGroup.appendChild(group);
+
+    // Improve tap target for label text (esp. when text-anchor is start/end).
+    try {
+      const bbox = label.getBBox();
+      const padX = 12;
+      const padY = 10;
+      const hitRect = svgEl("rect", {
+        x: (bbox.x - padX).toFixed(2),
+        y: (bbox.y - padY).toFixed(2),
+        width: (bbox.width + padX * 2).toFixed(2),
+        height: (bbox.height + padY * 2).toFixed(2),
+        rx: "12",
+        ry: "12",
+        class: "term-hit term-hit--label",
+      });
+      group.insertBefore(hitRect, label);
+    } catch {
+      // Ignore bbox failures; dot hit target still works.
+    }
 
     group.addEventListener("click", (event) => {
       event.stopPropagation();
@@ -421,20 +435,38 @@ function placeSun() {
 }
 
 function updateSunEarthLink(earthX, earthY, angleDeg, labelMode) {
-  indicatorLine.setAttribute("x1", focus);
-  indicatorLine.setAttribute("y1", 0);
-  indicatorLine.setAttribute("x2", earthX);
-  indicatorLine.setAttribute("y2", earthY);
+  const sx = focus;
+  const sy = 0;
+  const vx = earthX - sx;
+  const vy = earthY - sy;
+  const len = Math.hypot(vx, vy) || 1;
+  const ux = vx / len;
+  const uy = vy / len;
+
+  // Use circle edges (not centers) to make the link feel "connected".
+  const SUN_R = 30;
+  const EARTH_R = 14;
+  const x1 = sx + ux * SUN_R;
+  const y1 = sy + uy * SUN_R;
+  const x2 = earthX - ux * EARTH_R;
+  const y2 = earthY - uy * EARTH_R;
+
+  if (indicatorLineBack) {
+    indicatorLineBack.setAttribute("x1", x1);
+    indicatorLineBack.setAttribute("y1", y1);
+    indicatorLineBack.setAttribute("x2", x2);
+    indicatorLineBack.setAttribute("y2", y2);
+  }
+
+  indicatorLine.setAttribute("x1", x1);
+  indicatorLine.setAttribute("y1", y1);
+  indicatorLine.setAttribute("x2", x2);
+  indicatorLine.setAttribute("y2", y2);
 
   if (indicatorAngleText) {
-    const vx = earthX - focus;
-    const vy = earthY;
-    const len = Math.hypot(vx, vy) || 1;
-    const ux = vx / len;
-    const uy = vy / len;
-    const offset = 26;
-    const tx = earthX + ux * offset;
-    const ty = earthY + uy * offset;
+    const offset = 22;
+    const tx = x2 + ux * offset;
+    const ty = y2 + uy * offset;
     indicatorAngleText.setAttribute("x", tx);
     indicatorAngleText.setAttribute("y", ty);
     indicatorAngleText.textContent = formatAngle(angleDeg, 1);
@@ -542,11 +574,12 @@ function setupGoldenPositioning() {
 
   const base = { x: 0, y: 0 };
   const parallax = { x: 0, y: 0 };
+  const scale = 1;
 
   function updateTransform() {
     const x = base.x + parallax.x;
     const y = base.y + parallax.y;
-    svg.style.transform = `translate(${x.toFixed(2)}px, ${y.toFixed(2)}px)`;
+    svg.style.transform = `translate(${x.toFixed(2)}px, ${y.toFixed(2)}px) scale(${scale})`;
   }
 
   function updateGolden() {
