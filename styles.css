@@ -171,17 +171,12 @@ body::after {
   position: absolute;
   inset: 0;
   background: radial-gradient(
-    circle at var(--mx, 30%) var(--my, 10%),
-    rgba(246, 211, 124, 0.22),
-    transparent 65%
+    circle at 18% 12%,
+    rgba(246, 211, 124, 0.18),
+    transparent 60%
   );
-  opacity: 0;
-  transition: opacity 0.4s ease;
+  opacity: 0.2;
   pointer-events: none;
-}
-
-.bento-card:hover::after {
-  opacity: 1;
 }
 
 .visual {
@@ -512,9 +507,9 @@ body::after {
   position: absolute;
   inset: 0;
   background: radial-gradient(
-    circle at var(--mx, 70%) var(--my, 10%),
-    rgba(110, 215, 255, 0.2),
-    transparent 55%
+    circle at 80% 10%,
+    rgba(110, 215, 255, 0.18),
+    transparent 60%
   );
   pointer-events: none;
 }

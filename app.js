@@ -373,24 +373,12 @@ function clearTerm() {
 
 function updateIndicator(angleDeg) {
   const point = pointOnEllipse(angleDeg, a, b);
-  const vx = point.x - focus;
-  const vy = point.y;
-  const len = Math.hypot(vx, vy) || 1;
-  const ux = vx / len;
-  const uy = vy / len;
-  const sunRadius = 34;
-  const termRadius = 8;
-  const startX = focus + ux * sunRadius;
-  const startY = 0 + uy * sunRadius;
-  const endX = point.x - ux * termRadius;
-  const endY = point.y - uy * termRadius;
-
-  indicatorLine.setAttribute("x1", startX);
-  indicatorLine.setAttribute("y1", startY);
-  indicatorLine.setAttribute("x2", endX);
-  indicatorLine.setAttribute("y2", endY);
-  indicatorDot.setAttribute("cx", endX);
-  indicatorDot.setAttribute("cy", endY);
+  indicatorLine.setAttribute("x1", focus);
+  indicatorLine.setAttribute("y1", 0);
+  indicatorLine.setAttribute("x2", point.x);
+  indicatorLine.setAttribute("y2", point.y);
+  indicatorDot.setAttribute("cx", point.x);
+  indicatorDot.setAttribute("cy", point.y);
   indicatorGroup.classList.add("is-visible");
 }
 
@@ -433,23 +421,6 @@ function setupParallax() {
   });
 }
 
-function setupCardHover() {
-  const cards = document.querySelectorAll(".bento-card");
-  cards.forEach((card) => {
-    card.addEventListener("mousemove", (event) => {
-      const rect = card.getBoundingClientRect();
-      const x = ((event.clientX - rect.left) / rect.width) * 100;
-      const y = ((event.clientY - rect.top) / rect.height) * 100;
-      card.style.setProperty("--mx", `${x.toFixed(1)}%`);
-      card.style.setProperty("--my", `${y.toFixed(1)}%`);
-    });
-
-    card.addEventListener("mouseleave", () => {
-      card.style.removeProperty("--mx");
-      card.style.removeProperty("--my");
-    });
-  });
-}
 
 svg.addEventListener("click", (event) => {
   const target = event.target;
@@ -468,4 +439,3 @@ buildTermGrid();
 placeSun();
 animateEarth();
 setupParallax();
-setupCardHover();
