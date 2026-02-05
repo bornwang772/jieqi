@@ -210,18 +210,18 @@ body::after {
 }
 
 .bento-card--light {
-  background: linear-gradient(180deg, var(--paper), var(--paper-2));
-  border: 1px solid var(--paper-border);
-  box-shadow: var(--shadow-paper);
-  backdrop-filter: none;
-  color: var(--ink);
-  --card-text: var(--ink);
-  --card-muted: var(--ink-muted);
+  background: linear-gradient(180deg, rgba(16, 28, 60, 0.94), rgba(8, 16, 36, 0.9));
+  border: 1px solid rgba(110, 215, 255, 0.16);
+  box-shadow: 0 28px 70px rgba(2, 6, 20, 0.6);
+  backdrop-filter: blur(12px);
+  color: var(--text);
+  --card-text: var(--text);
+  --card-muted: rgba(210, 226, 255, 0.7);
 }
 
 .bento-card--light::after {
-  opacity: 0.32;
-  background: radial-gradient(circle at 15% 12%, rgba(47, 102, 255, 0.16), transparent 60%);
+  opacity: 0.38;
+  background: radial-gradient(circle at 15% 12%, rgba(99, 211, 255, 0.2), transparent 60%);
 }
 
 .visual {
@@ -322,6 +322,7 @@ body::after {
   display: block;
   transition: transform 0.4s ease;
   will-change: transform;
+  transform-origin: center;
 }
 
 .orbit__hint {
@@ -560,6 +561,8 @@ body::after {
 
 .earth {
   animation: earthPulse 3.8s ease-in-out infinite;
+  transform-box: fill-box;
+  transform-origin: center;
 }
 
 .earth__core {
@@ -635,6 +638,7 @@ body::after {
   margin: 0 0 6px;
   font-size: 18px;
   font-weight: 600;
+  color: var(--card-text);
 }
 
 .panel__header p {
@@ -700,29 +704,29 @@ body::after {
   top: 0;
   right: 0;
   border: none;
-  background: rgba(12, 24, 64, 0.08);
-  color: var(--ink);
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--text);
   padding: 6px 10px;
   border-radius: 10px;
   cursor: pointer;
   transition: background 0.2s ease, transform 0.2s ease;
-  border: 1px solid rgba(12, 24, 64, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.12);
 }
 
 .term-card__close:hover {
-  background: rgba(12, 24, 64, 0.12);
+  background: rgba(255, 255, 255, 0.16);
   transform: translateY(-1px);
 }
 
 .term-card__angle {
   font-size: 13px;
   letter-spacing: 0.6px;
-  color: var(--accent-3);
+  color: var(--accent-2);
 }
 
 .term-card__desc {
   margin: 0;
-  color: rgba(11, 22, 58, 0.9);
+  color: rgba(235, 244, 255, 0.92);
   line-height: 1.7;
   max-width: 44ch;
 }
@@ -770,7 +774,7 @@ body::after {
 
 .info-card__title {
   font-size: 13px;
-  color: var(--accent-3);
+  color: var(--accent);
   letter-spacing: 0.6px;
 }
 
@@ -795,9 +799,9 @@ body::after {
 }
 
 .term-chip {
-  border: 1px solid rgba(12, 24, 64, 0.12);
-  background: rgba(255, 255, 255, 0.78);
-  color: var(--ink);
+  border: 1px solid rgba(110, 215, 255, 0.2);
+  background: rgba(10, 18, 38, 0.85);
+  color: var(--text);
   border-radius: 12px;
   padding: 8px 8px;
   font-size: 12px;
@@ -809,24 +813,24 @@ body::after {
   position: relative;
   -webkit-tap-highlight-color: transparent;
   outline: none;
-  box-shadow: 0 10px 22px rgba(5, 13, 40, 0.1);
+  box-shadow: 0 12px 26px rgba(2, 6, 18, 0.5);
 }
 
 .term-chip:focus-visible {
-  box-shadow: 0 0 0 2px rgba(47, 102, 255, 0.24), 0 14px 30px rgba(5, 13, 40, 0.16);
+  box-shadow: 0 0 0 2px rgba(99, 211, 255, 0.35), 0 14px 30px rgba(2, 6, 18, 0.55);
 }
 
 .term-chip:hover {
   transform: translateY(-1px);
-  border-color: rgba(47, 102, 255, 0.26);
-  box-shadow: 0 16px 34px rgba(5, 13, 40, 0.14);
+  border-color: rgba(99, 211, 255, 0.4);
+  box-shadow: 0 16px 34px rgba(2, 6, 18, 0.6);
 }
 
 .term-chip.active {
-  background: linear-gradient(180deg, rgba(47, 102, 255, 0.14), rgba(99, 211, 255, 0.06));
-  border-color: rgba(47, 102, 255, 0);
-  color: rgba(11, 22, 58, 0.98);
-  box-shadow: 0 20px 44px rgba(47, 102, 255, 0.16), 0 18px 34px rgba(5, 13, 40, 0.12);
+  background: linear-gradient(180deg, rgba(99, 211, 255, 0.2), rgba(47, 102, 255, 0.06));
+  border-color: rgba(99, 211, 255, 0.0);
+  color: rgba(240, 247, 255, 0.98);
+  box-shadow: 0 20px 44px rgba(47, 102, 255, 0.22), 0 18px 34px rgba(2, 6, 18, 0.5);
 }
 
 .term-chip.active::before {
@@ -849,7 +853,7 @@ body::after {
   bottom: 6px;
   height: 2px;
   border-radius: 999px;
-  background: linear-gradient(90deg, transparent, rgba(47, 102, 255, 0.95), transparent);
+  background: linear-gradient(90deg, transparent, rgba(99, 211, 255, 0.95), transparent);
   opacity: 0.9;
 }
 
@@ -926,9 +930,11 @@ body::after {
   0%,
   100% {
     filter: drop-shadow(0 0 8px rgba(110, 215, 255, 0.4));
+    transform: scale(1);
   }
   50% {
     filter: drop-shadow(0 0 14px rgba(110, 215, 255, 0.8));
+    transform: scale(1.05);
   }
 }
 

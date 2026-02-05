@@ -445,7 +445,7 @@ function updateSunEarthLink(earthX, earthY, angleDeg, labelMode) {
 
   // Use circle edges (not centers) to make the link feel "connected".
   const SUN_R = 30;
-  const EARTH_R = 14;
+  const EARTH_R = 32;
   const x1 = sx + ux * SUN_R;
   const y1 = sy + uy * SUN_R;
   const x2 = earthX - ux * EARTH_R;
